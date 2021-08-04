@@ -42,7 +42,7 @@ namespace CoreBot.Watcher
                 if (fileSize > lastSize)
                 {
                     var messages = ReadTail(path, UpdateLastFileSize(fileSize));
-                    messages.ForEach(message => Discord.SendMessage(message, TextToPlayer, _server.Webhook));
+                    messages.ForEach(message => Discord.SendMessage(message, TextToPlayer, _server));
                 }
             }
             catch (Exception ex)
@@ -83,7 +83,7 @@ namespace CoreBot.Watcher
                 string message = Encoding.Unicode.GetString(Convert.FromBase64String(System.Text.RegularExpressions.Regex.Match(encodedMessage, @"msg=([\s\S]*)").Value.Replace("msg=", "")));
 
                 //Gera registro se a mensagem contiver a key "corebot" e se o conteúdo da mensagem (excluindo a key) for maior que 3 caracteres.
-                if (message.ToLower().Trim().Contains("@corebot") && message.ToLower().Trim().Replace("@corebot", string.Empty).Length > 3)
+                if (message.ToLower().Trim().Contains(_server.Trigger) && message.ToLower().Trim().Replace(_server.Trigger, string.Empty).Length > 3)
                 {
                     int roleId = int.Parse(System.Text.RegularExpressions.Regex.Match(encodedMessage, @"src=([0-9]*)").Value.Replace("src=", "").Trim());
                     string roleName = GetRoleData.Get(_server.Gamedbd, roleId).GRoleBase.Name;

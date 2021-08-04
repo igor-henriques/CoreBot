@@ -58,7 +58,8 @@ namespace CoreBot
                 jsonNodes["GAMEDBD"]["PORT"].ToObject<int>(),
                 (PwVersion)jsonNodes["PW_VERSION"].ToObject<int>(),
                 jsonNodes["LOGS_PATH"].ToObject<string>(),
-                jsonNodes["WEBHOOK"].ToObject<string>()
+                jsonNodes["WEBHOOK"].ToObject<string>(),
+                jsonNodes["TRIGGER"].ToObject<string>()
             );
 
             return ServerConnection;

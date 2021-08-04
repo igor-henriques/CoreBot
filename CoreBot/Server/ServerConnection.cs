@@ -9,14 +9,16 @@ namespace CoreBot.Server
         public PwVersion PwVersion { get; init; }
         public string LogsPath { get; init; }
         public string Webhook { get; init; }
+        public string Trigger { get; init; }
 
-        public ServerConnection(string GDeliverydHost, int GDeliverydPort, string GamedbdHost, int GamedbdPort, PwVersion _PwVersion, string _LogsPath, string _Webhook)
+        public ServerConnection(string GDeliverydHost, int GDeliverydPort, string GamedbdHost, int GamedbdPort, PwVersion _PwVersion, string _LogsPath, string _Webhook, string _Trigger)
         {
             this.GDeliveryd = new(GDeliverydHost, GDeliverydPort);
             this.Gamedbd = new(GamedbdHost, GamedbdPort);
             this.PwVersion = _PwVersion;
             this.LogsPath = _LogsPath;
             this.Webhook = _Webhook;
+            this.Trigger = _Trigger;
         }
     }
 }
