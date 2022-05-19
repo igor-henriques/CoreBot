@@ -1,14 +1,13 @@
-﻿namespace CoreBot.License
+﻿namespace CoreRanking.License;
+
+public enum State
 {
-    public enum State
-    {
-        Valido,
-        Inexiste,
-        Welcome,
-        Expirado,
-        Inativo,
-        Esgotado,
-        InvalidProduct,
-        Erro
-    }
+    Valido,
+    Inexiste,
+    Welcome,
+    Expirado,
+    Inativo,
+    Esgotado,
+    InvalidProduct,
+    Erro
 }

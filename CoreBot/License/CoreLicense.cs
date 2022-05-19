@@ -1,15 +1,21 @@
-﻿using System;
+﻿namespace CoreRanking.License;
 
-namespace CoreBot.License
+public class CoreLicense
 {
-    public class CoreLicense
+    public int Id { get; set; }
+    public string User { get; set; }
+    public string Licensekey { get; set; }
+    public DateTime Validade { get; set; }
+    public bool Active { get; set; }
+    public string Hwid { get; set; }
+    public Product Product { get; set; }
+
+    public CoreLicense()
     {
-        public int Id { get; set; }
-        public string User { get; set; }
-        public string Licensekey { get; set; }
-        public DateTime Validade { get; set; }
-        public bool Active { get; set; }
-        public string Hwid { get; set; }
-        public Product Product { get; set; }
+        JObject jsonNodes = (JObject)JsonConvert.DeserializeObject(File.ReadAllText("./Configurations/License.json"));
+
+        this.User = jsonNodes["user"].ToObject<string>();
+        this.Licensekey = jsonNodes["licensekey"].ToObject<string>();
+        this.Product = jsonNodes["product"].ToObject<Product>();
     }
 }

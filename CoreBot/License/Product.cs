@@ -1,19 +1,20 @@
-﻿namespace CoreBot.License
+﻿namespace CoreRanking.License;
+
+public enum Product
 {
-    public enum Product
-    {
-        Ranking,
-        Meridian,
-        Trivia,
-        ChatTrigger,
-        GoldWarning,
-        GoldQuest,
-        Sutra,
-        AutoMessage,
-        ChestOpener,
-        Giftcode,
-        LogWatch,
-        Discord,
-        Completo
-    }
+    Nenhum,
+    Ranking,
+    Meridian,
+    Trivia,
+    ChatTrigger,
+    GoldWarning,
+    GoldQuest,
+    Sutra,
+    AutoMessage,
+    ChestOpener,
+    Giftcode,
+    LogWatch,
+    Discord,
+    Completo,
+    Pincash
 }
