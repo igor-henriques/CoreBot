@@ -32,3 +32,4 @@ global using CoreBot.Domain.Models.LogModels;
 global using CoreBot.Infrastructure.Utils;
 global using CoreBot.Infrastructure.Interfaces;
 global using CoreBot.Infrastructure.Repositories;
+global using System.Text.RegularExpressions;

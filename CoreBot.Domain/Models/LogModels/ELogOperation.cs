@@ -4,5 +4,6 @@ public enum ELogOperation
 {
     None = -1,
     PickupItem,
-    DropItem
+    DropItem,
+    Chat,
 }

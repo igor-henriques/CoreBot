@@ -1,4 +1,6 @@
-﻿await Host.CreateDefaultBuilder(args)
+﻿using CoreBot.Domain.Factories;
+
+await Host.CreateDefaultBuilder(args)
     .ConfigureServices((services) =>
     {
         services.AddSingleton<IBackgroundTaskQueue>(_ =>
@@ -12,16 +14,13 @@
         });
 
         services.AddSingleton<Definitions>();
-        services.AddSingleton<CoreLicense>();
+        services.AddSingleton<CoreLicense>();        
         services.AddSingleton(_ => JsonConvert.DeserializeObject<ServerConnection>(File.ReadAllText("./Configurations/ServerConnection.json")));
-
         services.AddScoped<IServerRepository, ServerRepository>();
-
+        services.AddSingleton<ILogModelsFactory, LogModelsFactory>();        
         services.AddHostedService<LicenseControl>();
-
         services.AddHostedService<FormatlogProducer>();
         services.AddHostedService<LogProducer>();
-
         services.AddHostedService<FormatlogConsumer>();
         services.AddHostedService<LogWorker>();       
     })

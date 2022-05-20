@@ -1,17 +1,17 @@
 ﻿namespace CoreBot.Consumers;
 
-internal class FormatlogConsumer : BackgroundService
+internal class ChatConsumer : BackgroundService
 {    
     private readonly IBackgroundTaskQueue _taskQueue;
-    private readonly ILogger<FormatlogConsumer> _logger;
-    private readonly IServerRepository serverContext;
+    private readonly ILogger<ChatConsumer> _logger;
+    private readonly ILogModelsFactory logModelFactory;
     private static IDiscordService discordService;
 
-    public FormatlogConsumer(IServiceProvider services, ILogger<FormatlogConsumer> logger, IServerRepository serverContext)
+    public ChatConsumer(IServiceProvider services, ILogger<ChatConsumer> logger, ILogModelsFactory logModelFactory)
     {
         this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
         this._logger = logger;
-        this.serverContext = serverContext;
+        this.logModelFactory = logModelFactory;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,14 +37,10 @@ internal class FormatlogConsumer : BackgroundService
         {
             discordService = discordService ?? new DiscordService();
 
-            var logParseFunc = log.GetOperation() switch
-            {
-                ELogOperation.DropItem => TranslateToModel.GenerateDropItemLog(log),
-                ELogOperation.PickupItem => TranslateToModel.GeneratePickupItemLog(log),
-                _ => ValueTask.FromResult(default(IBaseLogModel))
-            };
+            if (!log.GetOperation().Equals(ELogOperation.Chat))
+                return;
 
-            var logParseResult = await logParseFunc;
+            var logParseResult = await logModelFactory.BuildChatModel(log);
 
             if (logParseResult is null | logParseResult is default(IBaseLogModel))
                 return;
@@ -59,7 +55,7 @@ internal class FormatlogConsumer : BackgroundService
 
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"{nameof(FormatlogConsumer)} finalizado.");
+        _logger.LogInformation($"{nameof(ChatConsumer)} finalizado.");
 
         await base.StopAsync(stoppingToken);
     }
