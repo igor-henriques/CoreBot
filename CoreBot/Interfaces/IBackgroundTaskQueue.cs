@@ -1,8 +1,8 @@
-﻿namespace CoreBot.Interfaces;
+﻿namespace CoreBot.Domain.Interfaces;
 
 public interface IBackgroundTaskQueue
 {
-    ValueTask QueueBackgroundWorkItemAsync(Func<CancellationToken, ValueTask> workItem);
+    ValueTask QueueBackgroundWorkItemAsync(Func<ValueTask> workItem);
 
-    ValueTask<Func<CancellationToken, ValueTask>> DequeueAsync(CancellationToken cancellationToken);
+    ValueTask<Func<ValueTask>> DequeueAsync(CancellationToken cancellationToken);
 }

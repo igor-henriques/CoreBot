@@ -32,7 +32,7 @@ internal class FormatlogProducer : BackgroundService
 
                 foreach (var log in logs)
                 {
-                    await _taskQueue.QueueBackgroundWorkItemAsync((CancellationToken cancellationToken) => log(cancellationToken));
+                    await _taskQueue.QueueBackgroundWorkItemAsync(() => log());
                 }
 
                 await Task.Delay(250);
@@ -44,7 +44,7 @@ internal class FormatlogProducer : BackgroundService
         }
     }
 
-    private async Task<IEnumerable<Func<CancellationToken, ValueTask>>> ReadTail(string filename, long offset)
+    private async Task<IEnumerable<Func<ValueTask>>> ReadTail(string filename, long offset)
     {
         try
         {
@@ -81,11 +81,11 @@ internal class FormatlogProducer : BackgroundService
         return default;
     }
 
-    private Func<CancellationToken, ValueTask> BuildTask(string log)
+    private Func<ValueTask> BuildTask(string log)
     {
-        var task = new Func<CancellationToken, ValueTask>(async (token) =>
+        var task = new Func<ValueTask>(async () =>
         {
-            await FormatlogConsumer.Process(token, log);
+            await FormatlogConsumer.Process(log);
         });
 
         return task;

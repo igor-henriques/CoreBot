@@ -5,7 +5,7 @@ public record ItemPickedup : IBaseLogModel
     public Role DroppedBy { get; set; }
     public Role PickedupBy { get; set; }
     public DateTime Date { get; set; }
-    public long ItemId { get; set; }
+    public long ItemId { get; set; }    
 
     public override string ToString()
     {

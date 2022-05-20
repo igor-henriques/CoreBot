@@ -25,21 +25,30 @@ internal class FormatlogConsumer : BackgroundService
         {
             var workItem = await _taskQueue.DequeueAsync(stoppingToken);
 
-            await workItem(stoppingToken);
+            workItem();
 
             await Task.Delay(1000);
         }
     }
 
-    public static async ValueTask Process(CancellationToken cancellationToken, string log)
+    public static async ValueTask Process(string log)
     {
         try
         {
             discordService = discordService ?? new DiscordService();
 
+            var logParseFunc = log.GetOperation() switch
+            {
+                ELogOperation.PickupItem => TranslateToModel.GeneratePickupItemLog(log),
+                _ => ValueTask.FromResult(default(IBaseLogModel))
+            };
 
+            var logParseResult = await logParseFunc;
 
-            await discordService.SendMessageAsync(WebHooks.Feedback, log);
+            if (logParseResult is null | logParseResult is default(IBaseLogModel))
+                return;
+
+            await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
         }
         catch (Exception e)
         {

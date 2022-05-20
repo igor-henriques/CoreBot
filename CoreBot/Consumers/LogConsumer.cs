@@ -25,13 +25,13 @@ internal class LogWorker : BackgroundService
         {
             var workItem = await _taskQueue.DequeueAsync(stoppingToken);
 
-            await workItem(stoppingToken);
+            await workItem();
 
             await Task.Delay(1000);
         }
     }
 
-    public static async ValueTask Process(CancellationToken cancellationToken, string log)
+    public static async ValueTask Process(string log)
     {
         try
         {
