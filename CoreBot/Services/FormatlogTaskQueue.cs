@@ -1,10 +1,10 @@
 ﻿namespace CoreBot.Services;
 
-public class BackgroundTaskQueue : IBackgroundTaskQueue
+public class FormatlogTaskQueue : IBackgroundTaskQueue
 {
     private readonly Channel<Func<CancellationToken, ValueTask>> _queue;
 
-    public BackgroundTaskQueue(int capacity)
+    public FormatlogTaskQueue(int capacity)
     {
         BoundedChannelOptions options = new(capacity)
         {

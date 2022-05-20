@@ -7,9 +7,9 @@ internal class FormatlogConsumer : BackgroundService
     private readonly IServerRepository serverContext;
     private static IDiscordService discordService;
 
-    public FormatlogConsumer(IBackgroundTaskQueue taskQueue, ILogger<FormatlogConsumer> logger, IServerRepository serverContext)
+    public FormatlogConsumer(IServiceProvider services, ILogger<FormatlogConsumer> logger, IServerRepository serverContext)
     {
-        this._taskQueue = taskQueue;
+        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
         this._logger = logger;
         this.serverContext = serverContext;
     }
@@ -36,6 +36,8 @@ internal class FormatlogConsumer : BackgroundService
         try
         {
             discordService = discordService ?? new DiscordService();
+
+
 
             await discordService.SendMessageAsync(WebHooks.Feedback, log);
         }

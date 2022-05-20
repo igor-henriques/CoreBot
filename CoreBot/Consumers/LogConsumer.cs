@@ -7,9 +7,9 @@ internal class LogWorker : BackgroundService
     private readonly IServerRepository serverContext;
     private static IDiscordService discordService;
 
-    public LogWorker(IBackgroundTaskQueue taskQueue, ILogger<LogWorker> logger, IServerRepository serverContext)
+    public LogWorker(IServiceProvider services, ILogger<LogWorker> logger, IServerRepository serverContext)
     {
-        this._taskQueue = taskQueue;
+        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
         this._logger = logger;
         this.serverContext = serverContext;
     }
@@ -45,8 +45,8 @@ internal class LogWorker : BackgroundService
 
             var logParseResult = await logParseFunc;
 
-            if (logParseResult is not null or not default(IBaseLogModel))
-                return;
+            if (logParseResult is null | logParseResult is default(IBaseLogModel))
+                return;            
 
             await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
         }

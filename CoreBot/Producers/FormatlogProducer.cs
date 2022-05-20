@@ -7,9 +7,9 @@ internal class FormatlogProducer : BackgroundService
     private long lastSize;
     private readonly string path;
 
-    public FormatlogProducer(IBackgroundTaskQueue taskQueue, ILogger<FormatlogProducer> logger, ServerConnection serverConnection)
+    public FormatlogProducer(IServiceProvider services, ILogger<FormatlogProducer> logger, ServerConnection serverConnection)
     {
-        this._taskQueue = taskQueue;
+        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(FormatlogTaskQueue));
         this._logger = logger;        
         this.path = Path.Combine(serverConnection.LogsPath, "world2.formatlog");
         //this.lastSize = GetFileSize(this.path);

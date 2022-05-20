@@ -7,9 +7,9 @@ internal class LogProducer : BackgroundService
     private long lastSize;
     private readonly string path;
 
-    public LogProducer(IBackgroundTaskQueue taskQueue, ILogger<LogProducer> logger, ServerConnection serverConnection)
+    public LogProducer(IServiceProvider services, ILogger<LogProducer> logger, ServerConnection serverConnection)
     {
-        this._taskQueue = taskQueue;
+        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
         this._logger = logger;
         this.path = Path.Combine(serverConnection.LogsPath, "world2.log");
         this.lastSize = GetFileSize(this.path);

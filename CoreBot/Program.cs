@@ -3,7 +3,12 @@
     {
         services.AddSingleton<IBackgroundTaskQueue>(_ =>
         {
-            return new BackgroundTaskQueue(10_000);
+            return new FormatlogTaskQueue(10_000);
+        });
+
+        services.AddSingleton<IBackgroundTaskQueue>(_ =>
+        {
+            return new LogTaskQueue(10_000);
         });
 
         services.AddSingleton<Definitions>();
