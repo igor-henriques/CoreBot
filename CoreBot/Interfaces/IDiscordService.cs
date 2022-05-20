@@ -1,4 +1,4 @@
-﻿namespace CoreBot.Domain.Interfaces;
+﻿namespace CoreBot.Interfaces;
 
 public interface IDiscordService
 {

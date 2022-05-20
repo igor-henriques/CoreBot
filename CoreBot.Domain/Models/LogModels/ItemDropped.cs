@@ -1,23 +1,22 @@
 ﻿namespace CoreBot.Domain.Models.LogModels;
 
-public class PickupItemFromWorldModel : IBaseLogModel
+public record ItemDropped : IBaseLogModel
 {
     public Role Dropped { get; set; }
-    public Role Pickedup { get; set; }
+    public int ItemId { get; set; }
+    public int Amount { get; set; }
     public DateTime Date { get; set; }
-    public long ItemId { get; set; }
 
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
 
-        if (this?.Dropped != null)
+        if (Dropped is not null)
             sb.AppendLine($"Dropado por: {this?.Dropped?.Name}({this?.Dropped?.Id})");
 
         sb.AppendLine($"Item dropado: {ItemId}");
 
-        if (this?.Pickedup != null)
-            sb.AppendLine($"Coletado por: {this?.Dropped?.Name}({this?.Dropped?.Id})");
+        sb.AppendLine($"Quantidade: {Amount}");
 
         sb.AppendLine($"Data: {Date.ToString("G")}");
 

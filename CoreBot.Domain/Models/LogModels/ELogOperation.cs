@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CoreBot.Domain.Models.LogModels;
 
-namespace CoreBot.Domain.Models.LogModels
+public enum ELogOperation
 {
-    public enum ELogOperation
-    {
-        None = -1,
-        PickupItem
-    }
+    None = -1,
+    PickupItem,
+    DropItem
 }

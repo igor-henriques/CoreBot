@@ -34,6 +34,13 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\CoreBot.Domain\CoreBot.Domain.csproj" />
+	  <ProjectReference Include="..\CoreBot.Infrastructure\CoreBot.Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="PWToolKit">
+	    <HintPath>F:\PWToolKit-master\PWToolKit\bin\Release\net6.0\PWToolKit.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

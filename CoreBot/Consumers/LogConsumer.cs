@@ -4,12 +4,14 @@ internal class LogWorker : BackgroundService
 {
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<LogWorker> _logger;
+    private readonly IServerRepository serverContext;
     private static IDiscordService discordService;
 
-    public LogWorker(IBackgroundTaskQueue taskQueue, ILogger<LogWorker> logger)
+    public LogWorker(IBackgroundTaskQueue taskQueue, ILogger<LogWorker> logger, IServerRepository serverContext)
     {
         this._taskQueue = taskQueue;
         this._logger = logger;
+        this.serverContext = serverContext;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)

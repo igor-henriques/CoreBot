@@ -1,4 +1,4 @@
-﻿namespace CoreBot.Utils;
+﻿namespace CoreBot.Infrastructure.Utils;
 
 public static class LogWriter
 {

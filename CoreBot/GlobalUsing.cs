@@ -2,6 +2,7 @@
 global using System.Threading;
 global using System.Threading.Tasks;
 global using CoreBot.Utils;
+global using CoreBot.Interfaces;
 global using System;
 global using System.Threading.Channels;
 global using CoreBot;
@@ -28,3 +29,6 @@ global using System.Text;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Linq;
 global using CoreBot.Domain.Models.LogModels;
+global using CoreBot.Infrastructure.Utils;
+global using CoreBot.Infrastructure.Interfaces;
+global using CoreBot.Infrastructure.Repositories;

@@ -1,0 +1,10 @@
+﻿global using PWToolKit;
+global using PWToolKit.Models;
+global using PWToolKit.Enums;
+global using CoreBot.Infrastructure.Interfaces;
+global using CoreBot.Infrastructure.Utils;
+global using Microsoft.Extensions.Logging;
+global using CoreBot.Domain.Models.ServerModels;
+global using PWToolKit.API.Gamedbd;
+global using PWToolKit.API.GDeliveryd;
+global using PWToolKit.API.GProvider;

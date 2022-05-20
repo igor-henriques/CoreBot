@@ -4,12 +4,14 @@ internal class FormatlogConsumer : BackgroundService
 {    
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<FormatlogConsumer> _logger;
+    private readonly IServerRepository serverContext;
     private static IDiscordService discordService;
 
-    public FormatlogConsumer(IBackgroundTaskQueue taskQueue, ILogger<FormatlogConsumer> logger)
+    public FormatlogConsumer(IBackgroundTaskQueue taskQueue, ILogger<FormatlogConsumer> logger, IServerRepository serverContext)
     {
         this._taskQueue = taskQueue;
         this._logger = logger;
+        this.serverContext = serverContext;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
