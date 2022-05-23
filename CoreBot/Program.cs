@@ -13,8 +13,8 @@ await Host.CreateDefaultBuilder(args)
             return new LogTaskQueue(10_000);
         });
 
-        services.AddSingleton<Definitions>();
-        services.AddSingleton<CoreLicense>();        
+        services.AddSingleton<CoreLicense>();
+        services.AddSingleton(_ => JsonConvert.DeserializeObject<Definitions>(File.ReadAllText("./Configurations/Definitions.json")));              
         services.AddSingleton(_ => JsonConvert.DeserializeObject<ServerConnection>(File.ReadAllText("./Configurations/ServerConnection.json")));
         services.AddScoped<IServerRepository, ServerRepository>();
         services.AddSingleton<ILogModelsFactory, LogModelsFactory>();        
@@ -22,7 +22,7 @@ await Host.CreateDefaultBuilder(args)
         services.AddHostedService<FormatlogProducer>();
         services.AddHostedService<LogProducer>();
         services.AddHostedService<FormatlogConsumer>();
-        services.AddHostedService<LogWorker>();       
+        services.AddHostedService<LogConsumer>();       
     })
     .Build()
     .RunAsync();

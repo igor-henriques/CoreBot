@@ -9,7 +9,7 @@ public class LogModelsFactory : ILogModelsFactory
     {
         this.logger = logger;
         this.serverContext = serverContext;
-    }    
+    }
 
     public async Task<ItemDropped> BuildItemDroppedModel(string log)
     {
@@ -20,7 +20,7 @@ public class LogModelsFactory : ILogModelsFactory
 
         var droppedBy = await serverContext.GetRoleByID(roleId);
         int.TryParse(Regex.Match(log, @"个([0-9]*)").Value.Replace("个", ""), out int itemId);
-        int.TryParse(Regex.Match(log, @"丢弃包裹([0-9]*)").Value.Replace("丢弃包裹", ""), out int itemAmount);        
+        int.TryParse(Regex.Match(log, @"丢弃包裹([0-9]*)").Value.Replace("丢弃包裹", ""), out int itemAmount);
 
         var model = new ItemDropped
         {
@@ -70,6 +70,24 @@ public class LogModelsFactory : ILogModelsFactory
 
     public async Task<Chat> BuildChatModel(string log)
     {
-        return new();
+        if (!int.TryParse(Regex.Match(log, @"src=([0-9]*)").Value.Replace("src=", ""), out int roleId))
+        {
+            return null;
+        }
+
+        var role = await serverContext.GetRoleByID(roleId);
+
+        var content = Regex.Match(log, @"msg=(.*)").Value.Replace("msg=", "");
+
+        var model = new Chat
+        {
+            SentFrom = Role.ToRole(role),
+            Content = Base64.DecodeFrom64(content),
+            Date = DateTime.Now,
+        };
+
+        logger.Write($"Log de chat construído: {model}");
+
+        return model;
     }
 }

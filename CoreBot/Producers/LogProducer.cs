@@ -4,14 +4,19 @@ internal class LogProducer : BackgroundService
 {
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<LogProducer> _logger;
+    private readonly IDiscordService discordService;
+    private readonly ILogModelsFactory logModelFactory;
     private long lastSize;
     private readonly string path;
 
-    public LogProducer(IServiceProvider services, ILogger<LogProducer> logger, ServerConnection serverConnection)
+    public LogProducer(IServiceProvider services, ILogger<LogProducer> logger, 
+        ServerConnection serverConnection, IDiscordService discordService, ILogModelsFactory logModelsFactory)
     {
         this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
         this._logger = logger;
-        this.path = Path.Combine(serverConnection.LogsPath, "world2.log");
+        this.discordService = discordService;
+        this.logModelFactory = logModelsFactory;
+        this.path = serverConnection.LogPath;
         this.lastSize = GetFileSize(this.path);
     }
 
@@ -85,7 +90,24 @@ internal class LogProducer : BackgroundService
     {
         var task = new Func<ValueTask>(async () =>
         {
-            await LogWorker.Process(log);
+            try
+            {
+                IBaseLogModel logParseResult = log.GetOperation() switch
+                {
+                    ELogOperation.PickupItem => await logModelFactory.BuildItemPickedupModel(log),
+                    ELogOperation.DropItem => await logModelFactory.BuildItemDroppedModel(log),
+                    _ => default(IBaseLogModel)
+                };
+
+                if (logParseResult != default(IBaseLogModel))
+                    return;
+
+                await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.Write(e.ToString());
+            }
         });
 
         return task;

@@ -4,14 +4,19 @@ internal class FormatlogProducer : BackgroundService
 {
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<FormatlogProducer> _logger;
+    private readonly IDiscordService discordService;
+    private readonly ILogModelsFactory logModelFactory;
     private long lastSize;
     private readonly string path;
 
-    public FormatlogProducer(IServiceProvider services, ILogger<FormatlogProducer> logger, ServerConnection serverConnection)
+    public FormatlogProducer(IServiceProvider services, ILogger<FormatlogProducer> logger, 
+        ServerConnection serverConnection, IDiscordService discordService, ILogModelsFactory logModelsFactory)
     {
         this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(FormatlogTaskQueue));
-        this._logger = logger;        
-        this.path = Path.Combine(serverConnection.LogsPath, "world2.formatlog");
+        this._logger = logger;
+        this.discordService = discordService;
+        this.logModelFactory = logModelsFactory;
+        this.path = serverConnection.FormatlogPath;
         //this.lastSize = GetFileSize(this.path);
     }
 
@@ -85,7 +90,24 @@ internal class FormatlogProducer : BackgroundService
     {
         var task = new Func<ValueTask>(async () =>
         {
-            await FormatlogConsumer.Process(log);
+            try
+            {
+                IBaseLogModel logParseResult = log.GetOperation() switch
+                {
+                    //ELogOperation.PickupItem => await logModelFactory.BuildItemPickedupModel(log),
+                    //ELogOperation.DropItem => await logModelFactory.BuildItemDroppedModel(log),
+                    _ => default(IBaseLogModel)
+                };                
+
+                if (logParseResult != default(IBaseLogModel))
+                    return;
+
+                await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.Write(e.ToString());
+            }
         });
 
         return task;

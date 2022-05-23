@@ -4,14 +4,19 @@ internal class ChatProducer : BackgroundService
 {
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<ChatProducer> _logger;
+    private readonly IDiscordService discordService;
+    private readonly ILogModelsFactory logModelFactory;
     private long lastSize;
     private readonly string path;
 
-    public ChatProducer(IServiceProvider services, ILogger<ChatProducer> logger, ServerConnection serverConnection)
+    public ChatProducer(IServiceProvider services, ILogger<ChatProducer> logger, 
+        ServerConnection serverConnection, IDiscordService discordService, ILogModelsFactory logModelsFactory)
     {
         this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
         this._logger = logger;
-        this.path = Path.Combine(serverConnection.LogsPath, "world2.chat");
+        this.discordService = discordService;
+        this.logModelFactory = logModelsFactory;
+        this.path = serverConnection.ChatPath;
         this.lastSize = GetFileSize(this.path);
     }
 
@@ -85,7 +90,22 @@ internal class ChatProducer : BackgroundService
     {
         var task = new Func<ValueTask>(async () =>
         {
-            await ChatConsumer.Process(log);
+            try
+            {
+                if (!log.GetOperation().Equals(ELogOperation.Chat))
+                    return;
+
+                var logParseResult = await logModelFactory.BuildChatModel(log);
+
+                if (logParseResult is null)
+                    return;
+
+                await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
+            }
+            catch (Exception e)
+            {
+                _logger.Write(e.ToString());
+            }
         });
 
         return task;
