@@ -11,3 +11,4 @@ global using PWToolKit.API.GProvider;
 global using CoreBot.Domain.Models.LogModels;
 global using System.Text;
 global using Microsoft.Extensions.DependencyInjection;
+global using CoreBot.Domain.Models;

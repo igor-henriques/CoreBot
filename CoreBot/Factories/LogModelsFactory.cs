@@ -4,11 +4,32 @@ public class LogModelsFactory : ILogModelsFactory
 {
     private readonly ILogger<LogModelsFactory> logger;
     private readonly IServerRepository serverContext;
+    private readonly IBaseCache roleCache;
 
-    public LogModelsFactory(ILogger<LogModelsFactory> logger, IServerRepository serverContext)
+    public LogModelsFactory(ILogger<LogModelsFactory> logger, IServerRepository serverContext, IBaseCache roleCache)
     {
         this.logger = logger;
         this.serverContext = serverContext;
+        this.roleCache = roleCache;
+    }
+
+    private async Task<Role> ResolveRoleCache(int roleId)
+    {
+        var role = roleCache.Get(roleId);
+
+        if (role != null)
+        {
+            return role;
+        }
+
+        var dbRole = Role.ToRole(await serverContext.GetRoleByID(roleId));
+
+        if (dbRole == null)
+        {
+            roleCache.Insert(dbRole);
+        }
+
+        return dbRole;
     }
 
     public async Task<ItemDropped> BuildItemDroppedModel(string log)
@@ -18,14 +39,15 @@ public class LogModelsFactory : ILogModelsFactory
             return null;
         }
 
-        var droppedBy = await serverContext.GetRoleByID(roleId);
+        var droppedBy = await ResolveRoleCache(roleId);
+
         int.TryParse(Regex.Match(log, @"个([0-9]*)").Value.Replace("个", ""), out int itemId);
         int.TryParse(Regex.Match(log, @"丢弃包裹([0-9]*)").Value.Replace("丢弃包裹", ""), out int itemAmount);
 
         var model = new ItemDropped
         {
             Amount = itemAmount,
-            DroppedBy = droppedBy is null ? null : Role.ToRole(droppedBy),
+            DroppedBy = droppedBy,
             Date = DateTime.Now,
             ItemId = itemId
         };
@@ -42,14 +64,14 @@ public class LogModelsFactory : ILogModelsFactory
             return null;
         }
 
-        var pickedupBy = await serverContext.GetRoleByID(pickedupByRoleId);
+        var pickedupBy = await ResolveRoleCache(pickedupByRoleId);
 
         if (!int.TryParse(Regex.Match(log, @"(\[用户([0-9]*))").Value.Replace("[用户", ""), out int droppedByRoleId))
         {
             return null;
         }
 
-        var droppedBy = await serverContext.GetRoleByID(droppedByRoleId);
+        var droppedBy = await ResolveRoleCache(droppedByRoleId);
 
         int.TryParse(Regex.Match(log, @"个([0-9]*)").Value.Replace("个", ""), out int itemId);
         int.TryParse(Regex.Match(log, @"拣起([0-9]*)").Value.Replace("拣起", ""), out int itemAmount);
@@ -57,8 +79,8 @@ public class LogModelsFactory : ILogModelsFactory
         var model = new ItemPickedup
         {
             Amount = itemAmount,
-            PickedupBy = pickedupBy is null ? null : Role.ToRole(pickedupBy),
-            DroppedBy = droppedBy is null ? null : Role.ToRole(droppedBy),
+            PickedupBy = pickedupBy,
+            DroppedBy = droppedBy,
             Date = DateTime.Now,
             ItemId = itemId
         };
@@ -75,13 +97,13 @@ public class LogModelsFactory : ILogModelsFactory
             return null;
         }
 
-        var role = await serverContext.GetRoleByID(roleId);
+        var role = await ResolveRoleCache(roleId);
 
         var content = Regex.Match(log, @"msg=(.*)").Value.Replace("msg=", "");
 
         var model = new Chat
         {
-            SentFrom = role is null ? null : Role.ToRole(role),
+            SentFrom = role,
             Content = content.DecodeBase64(),
             Date = DateTime.Now,
         };

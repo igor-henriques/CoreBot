@@ -11,6 +11,8 @@
         
         services.AddHostedService<LicenseControl>();
 
+        services.AddSingleton<IBaseCache, RoleCache>();
+
         services.AddSingleton<IBackgroundTaskQueue>(_ =>
         {
             return new FormatlogTaskQueue(10_000);
