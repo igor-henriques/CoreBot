@@ -1,4 +1,6 @@
-﻿namespace CoreBot.Producers;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace CoreBot.Producers;
 
 internal class ChatProducer : BackgroundService
 {
@@ -6,18 +8,22 @@ internal class ChatProducer : BackgroundService
     private readonly ILogger<ChatProducer> _logger;
     private readonly IDiscordService discordService;
     private readonly ILogModelsFactory logModelFactory;
+    private readonly Definitions definitions;
     private long lastSize;
     private readonly string path;
 
-    public ChatProducer(IServiceProvider services, ILogger<ChatProducer> logger, 
-        ServerConnection serverConnection, IDiscordService discordService, ILogModelsFactory logModelsFactory)
+    public ChatProducer(IServiceProvider services, ILogger<ChatProducer> logger, ServerConnection serverConnection,
+        IDiscordService discordService, ILogModelsFactory logModelsFactory, Definitions definitions)
     {
-        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
+        this._taskQueue = services.GetService<IBackgroundTaskQueue, ChatTaskQueue>();
         this._logger = logger;
         this.discordService = discordService;
         this.logModelFactory = logModelsFactory;
+        this.definitions = definitions;
         this.path = serverConnection.ChatPath;
         this.lastSize = GetFileSize(this.path);
+
+        this.definitions.Validate();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,7 +37,10 @@ internal class ChatProducer : BackgroundService
                 long fileSize = GetFileSize(path);
 
                 if (fileSize <= lastSize)
+                {
+                    await Task.Delay(250);
                     continue;
+                }
 
                 var logs = await ReadTail(path, UpdateLastFileSize(fileSize));
 
@@ -100,7 +109,7 @@ internal class ChatProducer : BackgroundService
                 if (logParseResult is null)
                     return;
 
-                await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
+                await discordService.SendMessageAsync(definitions.ChatWebhook, logParseResult.ToString());
             }
             catch (Exception e)
             {
@@ -137,5 +146,15 @@ internal class ChatProducer : BackgroundService
     public long GetFileSize(string fileName)
     {
         return new FileInfo(fileName).Length;
+    }
+    public override Task StartAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        return base.StartAsync(cancellationToken);
+    }
+    public override Task StopAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"{nameof(ChatProducer)} finalizado.");
+
+        return base.StopAsync(cancellationToken);
     }
 }

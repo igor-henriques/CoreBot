@@ -7,4 +7,10 @@ public record Definitions
 
     [JsonProperty("LOG_WEBHOOK")]
     public string LogWebhook { get; init; }
+
+    public void Validate()
+    {
+        if (string.IsNullOrEmpty(this.ChatWebhook) & string.IsNullOrEmpty(this.LogWebhook))
+            throw new ArgumentException("Não há webhook preenchido");
+    }
 }

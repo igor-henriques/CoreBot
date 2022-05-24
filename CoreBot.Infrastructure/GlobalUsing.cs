@@ -8,3 +8,6 @@ global using CoreBot.Domain.Models.ServerModels;
 global using PWToolKit.API.Gamedbd;
 global using PWToolKit.API.GDeliveryd;
 global using PWToolKit.API.GProvider;
+global using CoreBot.Domain.Models.LogModels;
+global using System.Text;
+global using Microsoft.Extensions.DependencyInjection;

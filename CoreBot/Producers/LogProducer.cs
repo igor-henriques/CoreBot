@@ -6,18 +6,22 @@ internal class LogProducer : BackgroundService
     private readonly ILogger<LogProducer> _logger;
     private readonly IDiscordService discordService;
     private readonly ILogModelsFactory logModelFactory;
+    private readonly Definitions definitions;
     private long lastSize;
     private readonly string path;
 
-    public LogProducer(IServiceProvider services, ILogger<LogProducer> logger, 
-        ServerConnection serverConnection, IDiscordService discordService, ILogModelsFactory logModelsFactory)
+    public LogProducer(IServiceProvider services, ILogger<LogProducer> logger, ServerConnection serverConnection,
+         IDiscordService discordService, ILogModelsFactory logModelsFactory, Definitions definitions)
     {
-        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
+        this._taskQueue = services.GetService<IBackgroundTaskQueue, LogTaskQueue>();
         this._logger = logger;
         this.discordService = discordService;
         this.logModelFactory = logModelsFactory;
+        this.definitions = definitions;
         this.path = serverConnection.LogPath;
         this.lastSize = GetFileSize(this.path);
+
+        this.definitions.Validate();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,7 +35,10 @@ internal class LogProducer : BackgroundService
                 long fileSize = GetFileSize(path);
 
                 if (fileSize <= lastSize)
+                {
+                    await Task.Delay(250);
                     continue;
+                }
 
                 var logs = await ReadTail(path, UpdateLastFileSize(fileSize));
 
@@ -102,7 +109,7 @@ internal class LogProducer : BackgroundService
                 if (logParseResult != default(IBaseLogModel))
                     return;
 
-                await discordService.SendMessageAsync(WebHooks.Feedback, logParseResult.ToString());
+                await discordService.SendMessageAsync(definitions.LogWebhook, logParseResult.ToString());
             }
             catch (Exception e)
             {
@@ -139,5 +146,15 @@ internal class LogProducer : BackgroundService
     public long GetFileSize(string fileName)
     {
         return new FileInfo(fileName).Length;
+    }
+    public override Task StartAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        return base.StartAsync(cancellationToken);
+    }
+    public override Task StopAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"{nameof(LogProducer)} finalizado.");
+
+        return base.StopAsync(cancellationToken);
     }
 }

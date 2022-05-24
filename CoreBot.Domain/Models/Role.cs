@@ -8,7 +8,7 @@ public record Role
     public int Race { get; set; }
 
     public static Role ToRole(GRoleData roleData)
-    {
+    {        
         return new Role
         {
             AccountId = roleData.GRoleBase.UserId,

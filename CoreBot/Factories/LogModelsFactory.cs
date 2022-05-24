@@ -25,12 +25,12 @@ public class LogModelsFactory : ILogModelsFactory
         var model = new ItemDropped
         {
             Amount = itemAmount,
-            DroppedBy = Role.ToRole(droppedBy),
+            DroppedBy = droppedBy is null ? null : Role.ToRole(droppedBy),
             Date = DateTime.Now,
             ItemId = itemId
         };
 
-        logger.Write($"Log de item construído: {model}");
+        logger.Write($"Log de item jogado no chão construído: {model}");
 
         return model;
     }
@@ -44,7 +44,7 @@ public class LogModelsFactory : ILogModelsFactory
 
         var pickedupBy = await serverContext.GetRoleByID(pickedupByRoleId);
 
-        if (!int.TryParse(Regex.Match(log, @"[用户([0-9]*)").Value.Replace("[用户", ""), out int droppedByRoleId))
+        if (!int.TryParse(Regex.Match(log, @"(\[用户([0-9]*))").Value.Replace("[用户", ""), out int droppedByRoleId))
         {
             return null;
         }
@@ -52,18 +52,18 @@ public class LogModelsFactory : ILogModelsFactory
         var droppedBy = await serverContext.GetRoleByID(droppedByRoleId);
 
         int.TryParse(Regex.Match(log, @"个([0-9]*)").Value.Replace("个", ""), out int itemId);
-        int.TryParse(Regex.Match(log, @"丢弃包裹([0-9]*)").Value.Replace("丢弃包裹", ""), out int itemAmount);
+        int.TryParse(Regex.Match(log, @"拣起([0-9]*)").Value.Replace("拣起", ""), out int itemAmount);
 
         var model = new ItemPickedup
         {
             Amount = itemAmount,
-            PickedupBy = Role.ToRole(pickedupBy),
-            DroppedBy = Role.ToRole(droppedBy),
+            PickedupBy = pickedupBy is null ? null : Role.ToRole(pickedupBy),
+            DroppedBy = droppedBy is null ? null : Role.ToRole(droppedBy),
             Date = DateTime.Now,
             ItemId = itemId
         };
 
-        logger.Write($"Log de item construído: {model}");
+        logger.Write($"Log de item coletado do chão construído: {model}");
 
         return model;
     }
@@ -81,8 +81,8 @@ public class LogModelsFactory : ILogModelsFactory
 
         var model = new Chat
         {
-            SentFrom = Role.ToRole(role),
-            Content = Base64.DecodeFrom64(content),
+            SentFrom = role is null ? null : Role.ToRole(role),
+            Content = content.DecodeBase64(),
             Date = DateTime.Now,
         };
 

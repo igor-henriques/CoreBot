@@ -23,7 +23,5 @@ public static class LogWriter
         txtWriter.WriteLine("  :");
         txtWriter.WriteLine("  :{0}", logMessage);
         txtWriter.WriteLine("-------------------------------");
-
-        Console.WriteLine(logMessage);
     }
 }

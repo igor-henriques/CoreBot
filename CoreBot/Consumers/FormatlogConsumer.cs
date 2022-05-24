@@ -7,17 +7,23 @@ internal class FormatlogConsumer : BackgroundService
 
     public FormatlogConsumer(IServiceProvider services, ILogger<FormatlogConsumer> logger)
     {
-        this._taskQueue = (IBackgroundTaskQueue)services.GetService(typeof(LogTaskQueue));
+        this._taskQueue = GetTaskQueue<FormatlogTaskQueue>(services);
         this._logger = logger;
     }
-
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    private IBackgroundTaskQueue GetTaskQueue<T>(IServiceProvider services) where T : IBackgroundTaskQueue
     {
-        return ProcessTaskQueueAsync(stoppingToken);
+        foreach (var task in services.GetServices(typeof(IBackgroundTaskQueue)))
+        {
+            if (task.GetType() == typeof(T))
+                return (T)task;
+        }
+
+        return null;
     }
-
-    private async Task ProcessTaskQueueAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _logger.Write($"{nameof(FormatlogConsumer)} inicializado");
+
         while (!stoppingToken.IsCancellationRequested)
         {
             var workItem = await _taskQueue.DequeueAsync(stoppingToken);
@@ -27,11 +33,15 @@ internal class FormatlogConsumer : BackgroundService
             await Task.Delay(1000);
         }
     }
-
+    
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation($"{nameof(FormatlogConsumer)} finalizado.");
 
         await base.StopAsync(stoppingToken);
+    }
+    public override Task StartAsync(System.Threading.CancellationToken cancellationToken)
+    {
+        return base.StartAsync(cancellationToken);
     }
 }
