@@ -1,7 +1,7 @@
 ﻿namespace CoreBot.Consumers;
 
 internal class FormatlogConsumer : BackgroundService
-{    
+{
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<FormatlogConsumer> _logger;
 
@@ -33,7 +33,7 @@ internal class FormatlogConsumer : BackgroundService
             await Task.Delay(1000);
         }
     }
-    
+
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation($"{nameof(FormatlogConsumer)} finalizado.");

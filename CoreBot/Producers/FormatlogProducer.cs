@@ -74,11 +74,11 @@ internal class FormatlogProducer : BackgroundService
 
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-                 var logs = GB2312ToUtf8(bytes)
-                        .Split(new string[] { "\n" }[0])
-                        .Where(x => !string.IsNullOrEmpty(x.Trim()))
-                        .Select(log => BuildTask(log))
-                        .ToList();
+                var logs = GB2312ToUtf8(bytes)
+                       .Split(new string[] { "\n" }[0])
+                       .Where(x => !string.IsNullOrEmpty(x.Trim()))
+                       .Select(log => BuildTask(log))
+                       .ToList();
 
                 return logs;
             });
@@ -102,7 +102,7 @@ internal class FormatlogProducer : BackgroundService
                 IBaseLogModel logParseResult = log.GetOperation() switch
                 {
                     _ => default(IBaseLogModel)
-                };                
+                };
 
                 if (logParseResult != default(IBaseLogModel))
                     return;

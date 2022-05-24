@@ -11,6 +11,6 @@ public record Definitions
     public void Validate()
     {
         if (string.IsNullOrEmpty(this.ChatWebhook) & string.IsNullOrEmpty(this.LogWebhook))
-            throw new ArgumentException("Não há webhook preenchido");
+            throw new ArgumentException("Não há webhook preenchido no arquivo Definitions.json33");
     }
 }

@@ -70,7 +70,7 @@ public class ServerRepository : IServerRepository
     {
         try
         {
-            await Task.Run(() => ChatBroadcast.Send(_server.GProvider, channel, message));            
+            await Task.Run(() => ChatBroadcast.Send(_server.GProvider, channel, message));
         }
         catch (Exception e)
         {

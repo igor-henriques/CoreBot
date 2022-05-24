@@ -6,7 +6,7 @@ public class GProvider : IPwDaemonConfig
     public string Host { get; set; }
 
     [JsonProperty("PORT")]
-    public int Port { get; set;  }
+    public int Port { get; set; }
 
     public GProvider(string host, int port)
     {

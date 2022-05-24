@@ -26,12 +26,10 @@ public class RoleCache : BaseCacheRecord<Role>, IBaseCache
         if (role is null)
             return;
 
-        if (!roleCache.TryGetValue(role.Id, out RoleCache cachedRole))
+        if (!roleCache.TryGetValue(role.Id, out _))
         {
-            this.roleCache.Add(role.Id, cachedRole = BuildCacheModel(role));
+            this.roleCache.Add(role.Id, BuildCacheModel(role));
         }
-
-        cachedRole.ExpireDate = DateTime.Now;
     }
 
     public void Remove(Role role)
@@ -39,7 +37,7 @@ public class RoleCache : BaseCacheRecord<Role>, IBaseCache
         if (role is null)
             return;
 
-        if (roleCache.TryGetValue(role.Id, out RoleCache cacheRole))
+        if (roleCache.TryGetValue(role.Id, out _))
         {
             roleCache.Remove(role.Id);
         }

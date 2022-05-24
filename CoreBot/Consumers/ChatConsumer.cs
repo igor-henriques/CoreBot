@@ -1,7 +1,7 @@
 ﻿namespace CoreBot.Consumers;
 
 internal class ChatConsumer : BackgroundService
-{    
+{
     private readonly IBackgroundTaskQueue _taskQueue;
     private readonly ILogger<ChatConsumer> _logger;
 

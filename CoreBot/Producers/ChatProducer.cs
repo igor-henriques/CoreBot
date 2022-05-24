@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace CoreBot.Producers;
+﻿namespace CoreBot.Producers;
 
 internal class ChatProducer : BackgroundService
 {
